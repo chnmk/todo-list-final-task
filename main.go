@@ -5,7 +5,9 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
+	"github.com/chnmk/todo-list-final-task/db"
 	"github.com/chnmk/todo-list-final-task/tests"
 	"github.com/joho/godotenv"
 )
@@ -13,8 +15,10 @@ import (
 var webDir = "./web/"
 
 func main() {
-	port := getEnv()
+	port, databaseDir := getEnv()
 	fmt.Printf("Port: %s\n", port)
+
+	db.SetupDB(databaseDir)
 
 	http.Handle("/", http.FileServer(http.Dir(webDir)))
 	err := http.ListenAndServe(port, nil)
@@ -23,7 +27,7 @@ func main() {
 	}
 }
 
-func getEnv() (port string) {
+func getEnv() (port string, dbpath string) {
 	// Попытка найти .env файл
 	err := godotenv.Load()
 	if err != nil {
@@ -37,6 +41,14 @@ func getEnv() (port string) {
 		port = fmt.Sprintf(":%s", port)
 	} else {
 		port = fmt.Sprintf(":%d", tests.Port)
+	}
+
+	// Загружает путь к базе данных
+	dbpath, exists = os.LookupEnv("TODO_DBFILE")
+	if exists {
+		dbpath = strings.ReplaceAll(dbpath, "../", "")
+	} else {
+		dbpath = strings.ReplaceAll(tests.DBFile, "../", "")
 	}
 
 	return
