@@ -7,6 +7,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/chnmk/todo-list-final-task/api"
 	"github.com/chnmk/todo-list-final-task/db"
 	"github.com/chnmk/todo-list-final-task/tests"
 	"github.com/joho/godotenv"
@@ -20,7 +21,9 @@ func main() {
 
 	db.SetupDB(databaseDir)
 
+	http.HandleFunc("/api/nextdate", api.NextDate)
 	http.Handle("/", http.FileServer(http.Dir(webDir)))
+
 	err := http.ListenAndServe(port, nil)
 	if err != nil {
 		panic(err)
