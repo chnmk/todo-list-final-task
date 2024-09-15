@@ -20,8 +20,10 @@ func main() {
 	fmt.Printf("Port: %s\n", port)
 
 	db.SetupDB(databaseDir)
+	api.DatabaseDir = databaseDir
 
 	http.HandleFunc("/api/nextdate", api.NextDate)
+	http.HandleFunc("/api/task", api.TaskRequest)
 	http.Handle("/", http.FileServer(http.Dir(webDir)))
 
 	err := http.ListenAndServe(port, nil)
