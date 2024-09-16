@@ -13,6 +13,7 @@ import (
 )
 
 type Task struct {
+	Id      string `json:"id"`
 	Date    string `json:"date"`
 	Title   string `json:"title"`
 	Comment string `json:"comment"`
@@ -30,11 +31,16 @@ type ResponseInvalid struct {
 var DatabaseDir = tests.DBFile
 
 func TaskRequest(w http.ResponseWriter, r *http.Request) {
+	var responseInvalid ResponseInvalid
+
 	switch r.Method {
 	case http.MethodPost:
 		taskRequestPOST(w, r)
+	// case http.MethodGet:
+	// 	taskRequestGET(w, r)
 	default:
-		http.Error(w, "некорректный метод, ожидался POST", http.StatusMethodNotAllowed)
+		responseInvalid.Error = "некорректный метод запроса"
+		returnInvalid(w, responseInvalid, 500)
 		return
 	}
 }
@@ -51,20 +57,20 @@ func taskRequestPOST(w http.ResponseWriter, r *http.Request) {
 	_, err := buf.ReadFrom(r.Body)
 	if err != nil {
 		responseInvalid.Error = err.Error()
-		returnInvalidPOST(w, responseInvalid, 400)
+		returnInvalid(w, responseInvalid, 400)
 		return
 	}
 
 	if err = json.Unmarshal(buf.Bytes(), &task); err != nil {
 		responseInvalid.Error = err.Error()
-		returnInvalidPOST(w, responseInvalid, 400)
+		returnInvalid(w, responseInvalid, 400)
 		return
 	}
 
 	// Проверка наличия title
 	if task.Title == "" {
 		responseInvalid.Error = "отсутствует название задачи"
-		returnInvalidPOST(w, responseInvalid, 400)
+		returnInvalid(w, responseInvalid, 400)
 		return
 	}
 
@@ -77,7 +83,7 @@ func taskRequestPOST(w http.ResponseWriter, r *http.Request) {
 	dateParsed, err := time.Parse("20060102", task.Date)
 	if err != nil {
 		responseInvalid.Error = "некорректный формат времени"
-		returnInvalidPOST(w, responseInvalid, 400)
+		returnInvalid(w, responseInvalid, 400)
 		return
 	}
 
@@ -88,7 +94,7 @@ func taskRequestPOST(w http.ResponseWriter, r *http.Request) {
 			task.Date, err = services.NextDate(time.Now(), task.Date, task.Repeat)
 			if err != nil {
 				responseInvalid.Error = err.Error()
-				returnInvalidPOST(w, responseInvalid, 400)
+				returnInvalid(w, responseInvalid, 400)
 				return
 			}
 		} else {
@@ -102,7 +108,7 @@ func taskRequestPOST(w http.ResponseWriter, r *http.Request) {
 	db, err := sql.Open("sqlite", DatabaseDir)
 	if err != nil {
 		responseInvalid.Error = err.Error()
-		returnInvalidPOST(w, responseInvalid, 500)
+		returnInvalid(w, responseInvalid, 500)
 		return
 	}
 
@@ -116,14 +122,14 @@ func taskRequestPOST(w http.ResponseWriter, r *http.Request) {
 	)
 	if err != nil {
 		responseInvalid.Error = err.Error()
-		returnInvalidPOST(w, responseInvalid, 500)
+		returnInvalid(w, responseInvalid, 500)
 		return
 	}
 
 	id, err := res.LastInsertId()
 	if err != nil {
 		responseInvalid.Error = err.Error()
-		returnInvalidPOST(w, responseInvalid, 500)
+		returnInvalid(w, responseInvalid, 500)
 		return
 	}
 
@@ -132,7 +138,7 @@ func taskRequestPOST(w http.ResponseWriter, r *http.Request) {
 	resp, err := json.Marshal(responseValid)
 	if err != nil {
 		responseInvalid.Error = err.Error()
-		returnInvalidPOST(w, responseInvalid, 500)
+		returnInvalid(w, responseInvalid, 500)
 		return
 	}
 
@@ -140,11 +146,17 @@ func taskRequestPOST(w http.ResponseWriter, r *http.Request) {
 	w.Write(resp)
 }
 
-func returnInvalidPOST(w http.ResponseWriter, msg ResponseInvalid, status int) {
+/*
+func taskRequestGET(w http.ResponseWriter, r *http.Request) {
+
+}
+*/
+
+func returnInvalid(w http.ResponseWriter, msg ResponseInvalid, status int) {
 	resp, err := json.Marshal(msg)
 	if err != nil {
 		msg.Error = "ошибка при записи ответа"
-		returnInvalidPOST(w, msg, 500)
+		returnInvalid(w, msg, 500)
 	}
 
 	if status == 400 {
