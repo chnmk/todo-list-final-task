@@ -2,7 +2,6 @@ package services
 
 import (
 	"errors"
-	"fmt"
 	"slices"
 	"strconv"
 	"strings"
@@ -52,7 +51,6 @@ func repeat_y(now time.Time, dateParsed time.Time) (string, error) {
 	// При необходимости переназначает задачу, пока дата не будет больше, чем now:
 	for !dateParsed.After(now) {
 		dateParsed = dateParsed.AddDate(1, 0, 0)
-		fmt.Println("Changed: ", dateParsed)
 	}
 
 	return dateParsed.Format("20060102"), nil

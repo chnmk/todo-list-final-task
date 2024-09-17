@@ -64,7 +64,6 @@ func TasksRequest(w http.ResponseWriter, r *http.Request) {
 
 		err := rows.Scan(&task.Id, &task.Date, &task.Title, &task.Comment, &task.Repeat)
 		if err != nil {
-			fmt.Println("1")
 			responseInvalid.Error = err.Error()
 			returnInvalid(w, responseInvalid, 500)
 			return
