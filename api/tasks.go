@@ -3,23 +3,17 @@ package api
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"time"
 )
 
-type ResponseArray struct {
-	Tasks []Task `json:"tasks"`
-}
-
 func TasksRequest(w http.ResponseWriter, r *http.Request) {
-	var responseInvalid ResponseInvalid
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
 	// Обработка параметров поиска
 	var searchDate bool
 	search := r.FormValue("search")
-	fmt.Println("search: ", search)
+
 	searchParsed, ok := time.Parse("02.01.2006", search)
 	if ok == nil {
 		searchDate = true
@@ -33,8 +27,7 @@ func TasksRequest(w http.ResponseWriter, r *http.Request) {
 
 	db, err := sql.Open("sqlite", DatabaseDir)
 	if err != nil {
-		responseInvalid.Error = err.Error()
-		returnInvalid(w, responseInvalid, 500)
+		returnError(w, err.Error(), 500)
 		return
 	}
 
@@ -51,8 +44,7 @@ func TasksRequest(w http.ResponseWriter, r *http.Request) {
 	// Выполнение нужного запроса
 	rows, err := db.Query(query, sql.Named("search", search))
 	if err != nil {
-		responseInvalid.Error = err.Error()
-		returnInvalid(w, responseInvalid, 500)
+		returnError(w, err.Error(), 500)
 		return
 	}
 
@@ -64,8 +56,7 @@ func TasksRequest(w http.ResponseWriter, r *http.Request) {
 
 		err := rows.Scan(&task.Id, &task.Date, &task.Title, &task.Comment, &task.Repeat)
 		if err != nil {
-			responseInvalid.Error = err.Error()
-			returnInvalid(w, responseInvalid, 500)
+			returnError(w, err.Error(), 500)
 			return
 		}
 
@@ -73,7 +64,7 @@ func TasksRequest(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Запись ответа
-	var result ResponseArray
+	var result TasksArray
 
 	if tasks != nil {
 		result.Tasks = tasks
@@ -83,8 +74,7 @@ func TasksRequest(w http.ResponseWriter, r *http.Request) {
 
 	resp, err := json.Marshal(result)
 	if err != nil {
-		responseInvalid.Error = err.Error()
-		returnInvalid(w, responseInvalid, 500)
+		returnError(w, err.Error(), 500)
 		return
 	}
 
