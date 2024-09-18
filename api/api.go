@@ -41,6 +41,8 @@ func TaskRequest(w http.ResponseWriter, r *http.Request) {
 		taskGET(w, r)
 	case http.MethodPut:
 		taskPUT(w, r)
+	case http.MethodDelete:
+		taskDELETE(w, r)
 	default:
 		returnError(w, "неожиданный метод запроса", 500)
 		return
