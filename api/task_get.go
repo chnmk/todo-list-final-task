@@ -42,6 +42,12 @@ func taskGET(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	// Возврат ошибки если задача не найдена
+	if task.Id == "" {
+		returnError(w, "задача не найдена", 500)
+		return
+	}
+
 	// Запись ответа
 	resp, err := json.Marshal(task)
 	if err != nil {

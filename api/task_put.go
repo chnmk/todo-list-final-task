@@ -25,7 +25,7 @@ func taskPUT(w http.ResponseWriter, r *http.Request) {
 
 	defer db.Close()
 
-	temp, err := db.Exec("UPDATE scheduler SET (date, title, comment, repeat) = (:date, :title, :comment, :repeat) WHERE id = :id",
+	upd, err := db.Exec("UPDATE scheduler SET (date, title, comment, repeat) = (:date, :title, :comment, :repeat) WHERE id = :id",
 		sql.Named("id", task.Id),
 		sql.Named("date", task.Date),
 		sql.Named("title", task.Title),
@@ -37,7 +37,7 @@ func taskPUT(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	rows, err := temp.RowsAffected()
+	rows, err := upd.RowsAffected()
 	if err != nil {
 		returnError(w, err.Error(), 500)
 		return
@@ -47,7 +47,7 @@ func taskPUT(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Если всё правильно, возвращает пустой ответ
-	resp, err := json.Marshal(ResponseValid{})
+	resp, err := json.Marshal(struct{}{})
 	if err != nil {
 		returnError(w, err.Error(), 500)
 		return

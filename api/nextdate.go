@@ -25,7 +25,7 @@ func NextDate(w http.ResponseWriter, r *http.Request) {
 
 	response, err := services.NextDate(nowTime, date, repeat)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 

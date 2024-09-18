@@ -25,6 +25,7 @@ func main() {
 	http.HandleFunc("/api/nextdate", api.NextDate)
 	http.HandleFunc("/api/task", api.TaskRequest)
 	http.HandleFunc("/api/tasks", api.TasksRequest)
+	http.HandleFunc("/api/task/done", api.TaskDone)
 	http.Handle("/", http.FileServer(http.Dir(webDir)))
 
 	err := http.ListenAndServe(port, nil)
