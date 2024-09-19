@@ -9,7 +9,7 @@ import (
 
 func NextDate(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
-		returnError(w, "неожиданный метод запроса, ожидался GET", 500)
+		returnError(w, "неожиданный метод запроса, ожидался GET", 400)
 		return
 	}
 

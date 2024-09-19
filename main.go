@@ -16,16 +16,26 @@ import (
 var webDir = "./web/"
 
 func main() {
-	port, databaseDir := getEnv()
+	port, databaseDir, password, authRequired := getEnv()
 	fmt.Printf("Port: %s\n", port)
 
 	db.SetupDB(databaseDir)
 	api.DatabaseDir = databaseDir
 
+	http.HandleFunc("/api/signin", api.AuthHandler)
 	http.HandleFunc("/api/nextdate", api.NextDate)
-	http.HandleFunc("/api/task", api.TaskRequest)
-	http.HandleFunc("/api/tasks", api.TasksRequest)
-	http.HandleFunc("/api/task/done", api.TaskDone)
+
+	if !authRequired {
+		http.HandleFunc("/api/task", api.TaskRequest)
+		http.HandleFunc("/api/tasks", api.TasksRequest)
+		http.HandleFunc("/api/task/done", api.TaskDone)
+	} else {
+		api.EnvPassword = password
+		http.HandleFunc("/api/task", api.Auth(api.TaskRequest))
+		http.HandleFunc("/api/tasks", api.Auth(api.TasksRequest))
+		http.HandleFunc("/api/task/done", api.Auth(api.TaskDone))
+	}
+
 	http.Handle("/", http.FileServer(http.Dir(webDir)))
 
 	err := http.ListenAndServe(port, nil)
@@ -34,7 +44,7 @@ func main() {
 	}
 }
 
-func getEnv() (port string, dbpath string) {
+func getEnv() (port string, dbpath string, password string, authRequired bool) {
 	// Попытка найти .env файл
 	err := godotenv.Load()
 	if err != nil {
@@ -56,6 +66,12 @@ func getEnv() (port string, dbpath string) {
 		dbpath = strings.ReplaceAll(dbpath, "../", "")
 	} else {
 		dbpath = strings.ReplaceAll(tests.DBFile, "../", "")
+	}
+
+	// Загружает пароль
+	password, exists = os.LookupEnv("TODO_PASSWORD")
+	if exists {
+		authRequired = true
 	}
 
 	return

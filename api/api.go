@@ -31,6 +31,15 @@ type ResponseInvalid struct {
 	Error string `json:"error"`
 }
 
+type PasswordStruct struct {
+	Password string `json:"password"`
+}
+
+type TokenStruct struct {
+	Token string `json:"token"`
+}
+
+var EnvPassword string
 var DatabaseDir = tests.DBFile
 
 func TaskRequest(w http.ResponseWriter, r *http.Request) {
@@ -61,6 +70,8 @@ func returnError(w http.ResponseWriter, msg string, status int) {
 
 	if status == 400 {
 		w.WriteHeader(http.StatusBadRequest)
+	} else if status == 401 {
+		w.WriteHeader(http.StatusUnauthorized)
 	} else {
 		w.WriteHeader(http.StatusInternalServerError)
 	}
