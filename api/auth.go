@@ -7,6 +7,7 @@ import (
 	"github.com/golang-jwt/jwt"
 )
 
+// Middleware для проверки прав пользователя
 func Auth(next http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		pass := os.Getenv("TODO_PASSWORD")

@@ -7,6 +7,7 @@ import (
 	"time"
 )
 
+// Обрабатывает запросы к /api/tasks, возвращает ближайшие 10 задач.
 func TasksRequest(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 

@@ -7,6 +7,7 @@ import (
 	"github.com/chnmk/todo-list-final-task/services"
 )
 
+// Возвращает следующую дату в соответствии с данными запроса.
 func NextDate(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		returnError(w, "неожиданный метод запроса, ожидался GET", 400)

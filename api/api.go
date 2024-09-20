@@ -42,6 +42,7 @@ type TokenStruct struct {
 var EnvPassword string
 var DatabaseDir = tests.DBFile
 
+// Выбирает хендлер в зависимости от метода запроса к /api/task, либо возвращает ошибку
 func TaskRequest(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodPost:
@@ -58,6 +59,7 @@ func TaskRequest(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// Записывает текст ошибки в JSON-файл и возвращает ответ с указанным кодом ошибки.
 func returnError(w http.ResponseWriter, msg string, status int) {
 	var e ResponseInvalid
 	e.Error = msg
@@ -79,6 +81,7 @@ func returnError(w http.ResponseWriter, msg string, status int) {
 	w.Write(resp)
 }
 
+// Читает тело запроса и проверяет полученные данные на корректность.
 func checkRequest(w http.ResponseWriter, r *http.Request) (Task, error) {
 	now := time.Now().Format("20060102")
 	nowParsed, err := time.Parse("20060102", now)
@@ -101,7 +104,7 @@ func checkRequest(w http.ResponseWriter, r *http.Request) (Task, error) {
 		return Task{}, err
 	}
 
-	// Проверка наличия title
+	// Проверка на наличие title
 	if task.Title == "" {
 		returnError(w, "отсутствует название задачи", 400)
 		return Task{}, errors.New("отсутствует название задачи")

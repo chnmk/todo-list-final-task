@@ -9,6 +9,7 @@ import (
 	"github.com/chnmk/todo-list-final-task/services"
 )
 
+// Удаляет или переносит на следующую дату задачу с полученном в запросе id.
 func TaskDone(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		returnError(w, "неожиданный метод запроса", 500)

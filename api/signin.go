@@ -3,11 +3,13 @@ package api
 import (
 	"bytes"
 	"encoding/json"
+	"log"
 	"net/http"
 
 	"github.com/golang-jwt/jwt"
 )
 
+// Обрабатывает запросы к /api/signin. При успешном запросе возвращает JSON с JWT-токеном.
 func AuthHandler(w http.ResponseWriter, r *http.Request) {
 	if EnvPassword == "" {
 		returnError(w, "авторизация не предусмотрена", 400)
@@ -48,7 +50,7 @@ func AuthHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Вывод токена в консоль для тестов
-	// log.Println("ТОКЕН: " + signedToken)
+	log.Println("JWT ТОКЕН: " + signedToken)
 
 	var tokenStruct TokenStruct
 	tokenStruct.Token = signedToken
