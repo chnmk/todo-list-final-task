@@ -17,15 +17,7 @@ func taskPUT(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Если всё правильно, редактирует запись
-	db, err := sql.Open("sqlite", DatabaseDir)
-	if err != nil {
-		ReturnError(w, err.Error(), 500)
-		return
-	}
-
-	defer db.Close()
-
-	upd, err := db.Exec("UPDATE scheduler SET (date, title, comment, repeat) = (:date, :title, :comment, :repeat) WHERE id = :id",
+	upd, err := DatabaseFile.Exec("UPDATE scheduler SET (date, title, comment, repeat) = (:date, :title, :comment, :repeat) WHERE id = :id",
 		sql.Named("id", task.Id),
 		sql.Named("date", task.Date),
 		sql.Named("title", task.Title),

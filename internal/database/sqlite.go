@@ -9,31 +9,34 @@ import (
 )
 
 // Подключается к существующей базе SQLite или создает новую.
-func SetupDB(dir string) {
-	// Проверяет, существует ли база данных
-	_, err := os.Stat(dir)
-	if err == nil {
-		return
-	}
+func SetupDB(dir string) *sql.DB {
+	// Проверяет, существует ли база данных по указанному пути
+	_, errNoDB := os.Stat(dir)
 
-	// Если базы нет, её необходимо создать
+	// Подключение
 	db, err := sql.Open("sqlite", dir)
 	if err != nil {
 		fmt.Println(err)
-		return
+		return nil
 	}
 
-	defer db.Close()
+	// Если БД уже существовала, возвращает на неё ссылку
+	if errNoDB == nil {
+		return db
+	}
 
+	// В ином случае БД необходимо создать
 	_, err = db.Exec("CREATE TABLE scheduler (id INTEGER PRIMARY KEY AUTOINCREMENT, date CHAR(8), title VARCHAR(255), comment VARCHAR(255), repeat VARCHAR(128));")
 	if err != nil {
 		fmt.Println(err)
-		return
+		return nil
 	}
 
 	_, err = db.Exec("CREATE INDEX scheduler_dates ON scheduler (date);")
 	if err != nil {
 		fmt.Println(err)
-		return
+		return nil
 	}
+
+	return db
 }

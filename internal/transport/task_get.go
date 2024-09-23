@@ -15,17 +15,8 @@ func taskGET(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Подключение к базе
-	db, err := sql.Open("sqlite", DatabaseDir)
-	if err != nil {
-		ReturnError(w, err.Error(), 500)
-		return
-	}
-
-	defer db.Close()
-
 	// Выполнение запроса
-	rows, err := db.Query("SELECT * FROM scheduler WHERE id = :id LIMIT 1", sql.Named("id", id))
+	rows, err := DatabaseFile.Query("SELECT * FROM scheduler WHERE id = :id LIMIT 1", sql.Named("id", id))
 	if err != nil {
 		ReturnError(w, err.Error(), 500)
 		return

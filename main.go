@@ -18,12 +18,18 @@ import (
 var webDir = "./web/"
 
 func main() {
+	// Переменные окружения
 	port, databaseDir, password, authRequired := getEnv()
 	fmt.Printf("Port: %s\n", port)
 
-	database.SetupDB(databaseDir)
-	transport.DatabaseDir = databaseDir
+	// Подключение к БД
+	db := database.SetupDB(databaseDir)
+	defer db.Close()
 
+	transport.DatabaseDir = databaseDir
+	transport.DatabaseFile = db
+
+	// Маршрутизация
 	http.HandleFunc("/api/signin", auth.AuthHandler)
 	http.HandleFunc("/api/nextdate", transport.NextDate)
 
@@ -40,6 +46,7 @@ func main() {
 
 	http.Handle("/", http.FileServer(http.Dir(webDir)))
 
+	// Запуск сервера
 	err := http.ListenAndServe(port, nil)
 	if err != nil {
 		panic(err)

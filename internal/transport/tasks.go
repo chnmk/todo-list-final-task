@@ -23,18 +23,9 @@ func TasksRequest(w http.ResponseWriter, r *http.Request) {
 		search = "%" + search + "%" // Для подстановки в запрос с LIKE в SQL
 	}
 
-	// Подключение к базе данных
+	// Составление строки запроса
 	var tasks []Task
 
-	db, err := sql.Open("sqlite", DatabaseDir)
-	if err != nil {
-		ReturnError(w, err.Error(), 500)
-		return
-	}
-
-	defer db.Close()
-
-	// Составление строки запроса
 	query := "SELECT * FROM scheduler ORDER BY date LIMIT 10"
 	if search != "" && !searchDate {
 		query = "SELECT * FROM scheduler WHERE title LIKE :search OR comment LIKE :search ORDER BY date LIMIT 10"
@@ -43,7 +34,7 @@ func TasksRequest(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Выполнение нужного запроса
-	rows, err := db.Query(query, sql.Named("search", search))
+	rows, err := DatabaseFile.Query(query, sql.Named("search", search))
 	if err != nil {
 		ReturnError(w, err.Error(), 500)
 		return

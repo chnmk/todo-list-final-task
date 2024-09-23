@@ -18,15 +18,7 @@ func taskPOST(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Если всё правильно, добавляет новую запись
-	db, err := sql.Open("sqlite", DatabaseDir)
-	if err != nil {
-		ReturnError(w, err.Error(), 500)
-		return
-	}
-
-	defer db.Close()
-
-	res, err := db.Exec("INSERT INTO scheduler (date, title, comment, repeat) VALUES (:date, :title, :comment, :repeat)",
+	res, err := DatabaseFile.Exec("INSERT INTO scheduler (date, title, comment, repeat) VALUES (:date, :title, :comment, :repeat)",
 		sql.Named("date", task.Date),
 		sql.Named("title", task.Title),
 		sql.Named("comment", task.Comment),

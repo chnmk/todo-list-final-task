@@ -25,17 +25,9 @@ func TaskDone(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Получение нужной записи
-	db, err := sql.Open("sqlite", DatabaseDir)
-	if err != nil {
-		ReturnError(w, err.Error(), 500)
-		return
-	}
+	row := DatabaseFile.QueryRow("SELECT date, repeat FROM scheduler WHERE id = :id LIMIT 1", sql.Named("id", id))
 
-	defer db.Close()
-
-	row := db.QueryRow("SELECT date, repeat FROM scheduler WHERE id = :id LIMIT 1", sql.Named("id", id))
-
-	err = row.Scan(&task.Date, &task.Repeat)
+	err := row.Scan(&task.Date, &task.Repeat)
 	if err != nil {
 		ReturnError(w, err.Error(), 500)
 		return
@@ -47,7 +39,7 @@ func TaskDone(w http.ResponseWriter, r *http.Request) {
 
 	// Удаление записи без правил повторения
 	if task.Repeat == "" {
-		del, err := db.Exec("DELETE FROM scheduler WHERE id = :id",
+		del, err := DatabaseFile.Exec("DELETE FROM scheduler WHERE id = :id",
 			sql.Named("id", id),
 		)
 		if err != nil {
@@ -71,7 +63,7 @@ func TaskDone(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		upd, err := db.Exec("UPDATE scheduler SET date = :date WHERE id = :id",
+		upd, err := DatabaseFile.Exec("UPDATE scheduler SET date = :date WHERE id = :id",
 			sql.Named("id", id),
 			sql.Named("date", task.Date),
 		)

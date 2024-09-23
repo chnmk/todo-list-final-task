@@ -2,6 +2,7 @@ package transport
 
 import (
 	"bytes"
+	"database/sql"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -40,6 +41,7 @@ type TokenStruct struct {
 }
 
 var EnvPassword string
+var DatabaseFile *sql.DB
 var DatabaseDir = tests.DBFile
 
 // Выбирает хендлер в зависимости от метода запроса к /api/task, либо возвращает ошибку

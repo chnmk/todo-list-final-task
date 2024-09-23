@@ -13,17 +13,8 @@ func taskDELETE(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Получение нужной записи
-	db, err := sql.Open("sqlite", DatabaseDir)
-	if err != nil {
-		ReturnError(w, err.Error(), 500)
-		return
-	}
-
-	defer db.Close()
-
 	// Удаление записи без правил повторения
-	del, err := db.Exec("DELETE FROM scheduler WHERE id = :id",
+	del, err := DatabaseFile.Exec("DELETE FROM scheduler WHERE id = :id",
 		sql.Named("id", id),
 	)
 	if err != nil {
