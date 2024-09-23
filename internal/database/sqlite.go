@@ -1,4 +1,4 @@
-package db
+package database
 
 import (
 	"database/sql"
@@ -8,6 +8,7 @@ import (
 	_ "modernc.org/sqlite"
 )
 
+// Подключается к существующей базе SQLite или создает новую.
 func SetupDB(dir string) {
 	// Проверяет, существует ли база данных
 	_, err := os.Stat(dir)

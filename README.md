@@ -22,7 +22,7 @@ go run .
 # Порт сервера, по умолчанию 7540
 TODO_PORT='7541'
 
-# Путь к файлу БД, по умолчанию ../db/scheduler.db:
+# Путь к файлу БД, по умолчанию ../internal/database/scheduler.db:
 TODO_DBFILE='/mypath/scheduler.db'
 
 # Пароль для аутентификации, по умолчанию отсутствует:
@@ -55,7 +55,7 @@ go test ./tests
 ```
 # Настройка переменных в соответствии с переменными окружения:
 var Port = 7540
-var DBFile = "../db/scheduler.db"
+var DBFile = "../internal/database/scheduler.db"
 
 # Включить тесты для проверки дополнительного функционала:
 var FullNextDate = true
@@ -64,5 +64,5 @@ var Search = true
 # JWT для проверки аутентификации. 
 # По умолчанию соответствует паролю '12345'. 
 # Выводится в консоли при авторизации:
-var Token = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.e30.B9AbOPxyxcQwAILN_chotv8DlBnwUANG9x7Ep-Ioj80`
+var Token = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.e30.396KCDWMomWrMEImsF84AmFRjBEvSvnyLh3ZA_mB_Wg`
 ```

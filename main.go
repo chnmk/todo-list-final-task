@@ -7,8 +7,10 @@ import (
 	"os"
 	"strings"
 
-	"github.com/chnmk/todo-list-final-task/api"
-	"github.com/chnmk/todo-list-final-task/db"
+	"github.com/chnmk/todo-list-final-task/internal/database"
+	"github.com/chnmk/todo-list-final-task/internal/transport"
+	"github.com/chnmk/todo-list-final-task/internal/transport/auth"
+	"github.com/chnmk/todo-list-final-task/internal/transport/middleware"
 	"github.com/chnmk/todo-list-final-task/tests"
 	"github.com/joho/godotenv"
 )
@@ -19,21 +21,21 @@ func main() {
 	port, databaseDir, password, authRequired := getEnv()
 	fmt.Printf("Port: %s\n", port)
 
-	db.SetupDB(databaseDir)
-	api.DatabaseDir = databaseDir
+	database.SetupDB(databaseDir)
+	transport.DatabaseDir = databaseDir
 
-	http.HandleFunc("/api/signin", api.AuthHandler)
-	http.HandleFunc("/api/nextdate", api.NextDate)
+	http.HandleFunc("/api/signin", auth.AuthHandler)
+	http.HandleFunc("/api/nextdate", transport.NextDate)
 
 	if !authRequired {
-		http.HandleFunc("/api/task", api.TaskRequest)
-		http.HandleFunc("/api/tasks", api.TasksRequest)
-		http.HandleFunc("/api/task/done", api.TaskDone)
+		http.HandleFunc("/api/task", transport.TaskRequest)
+		http.HandleFunc("/api/tasks", transport.TasksRequest)
+		http.HandleFunc("/api/task/done", transport.TaskDone)
 	} else {
-		api.EnvPassword = password
-		http.HandleFunc("/api/task", api.Auth(api.TaskRequest))
-		http.HandleFunc("/api/tasks", api.Auth(api.TasksRequest))
-		http.HandleFunc("/api/task/done", api.Auth(api.TaskDone))
+		transport.EnvPassword = password
+		http.HandleFunc("/api/task", middleware.Auth(transport.TaskRequest))
+		http.HandleFunc("/api/tasks", middleware.Auth(transport.TasksRequest))
+		http.HandleFunc("/api/task/done", middleware.Auth(transport.TaskDone))
 	}
 
 	http.Handle("/", http.FileServer(http.Dir(webDir)))

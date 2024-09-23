@@ -1,4 +1,4 @@
-package api
+package transport
 
 import (
 	"database/sql"
@@ -12,14 +12,14 @@ func taskPUT(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if task.Id == "" {
-		returnError(w, "не указан id задачи", 400)
+		ReturnError(w, "не указан id задачи", 400)
 		return
 	}
 
 	// Если всё правильно, редактирует запись
 	db, err := sql.Open("sqlite", DatabaseDir)
 	if err != nil {
-		returnError(w, err.Error(), 500)
+		ReturnError(w, err.Error(), 500)
 		return
 	}
 
@@ -33,23 +33,23 @@ func taskPUT(w http.ResponseWriter, r *http.Request) {
 		sql.Named("repeat", task.Repeat),
 	)
 	if err != nil {
-		returnError(w, err.Error(), 500)
+		ReturnError(w, err.Error(), 500)
 		return
 	}
 
 	rows, err := upd.RowsAffected()
 	if err != nil {
-		returnError(w, err.Error(), 500)
+		ReturnError(w, err.Error(), 500)
 		return
 	} else if rows == 0 {
-		returnError(w, "задача не найдена", 500)
+		ReturnError(w, "задача не найдена", 500)
 		return
 	}
 
 	// Если всё правильно, возвращает пустой ответ
 	resp, err := json.Marshal(struct{}{})
 	if err != nil {
-		returnError(w, err.Error(), 500)
+		ReturnError(w, err.Error(), 500)
 		return
 	}
 

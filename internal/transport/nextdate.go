@@ -1,16 +1,16 @@
-package api
+package transport
 
 import (
 	"net/http"
 	"time"
 
-	"github.com/chnmk/todo-list-final-task/services"
+	"github.com/chnmk/todo-list-final-task/internal/services"
 )
 
 // Возвращает следующую дату в соответствии с данными запроса.
 func NextDate(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
-		returnError(w, "неожиданный метод запроса, ожидался GET", 400)
+		ReturnError(w, "неожиданный метод запроса, ожидался GET", 400)
 		return
 	}
 

@@ -1,4 +1,4 @@
-package api
+package transport
 
 import (
 	"database/sql"
@@ -28,7 +28,7 @@ func TasksRequest(w http.ResponseWriter, r *http.Request) {
 
 	db, err := sql.Open("sqlite", DatabaseDir)
 	if err != nil {
-		returnError(w, err.Error(), 500)
+		ReturnError(w, err.Error(), 500)
 		return
 	}
 
@@ -45,7 +45,7 @@ func TasksRequest(w http.ResponseWriter, r *http.Request) {
 	// Выполнение нужного запроса
 	rows, err := db.Query(query, sql.Named("search", search))
 	if err != nil {
-		returnError(w, err.Error(), 500)
+		ReturnError(w, err.Error(), 500)
 		return
 	}
 
@@ -57,7 +57,7 @@ func TasksRequest(w http.ResponseWriter, r *http.Request) {
 
 		err := rows.Scan(&task.Id, &task.Date, &task.Title, &task.Comment, &task.Repeat)
 		if err != nil {
-			returnError(w, err.Error(), 500)
+			ReturnError(w, err.Error(), 500)
 			return
 		}
 
@@ -75,7 +75,7 @@ func TasksRequest(w http.ResponseWriter, r *http.Request) {
 
 	resp, err := json.Marshal(result)
 	if err != nil {
-		returnError(w, err.Error(), 500)
+		ReturnError(w, err.Error(), 500)
 		return
 	}
 

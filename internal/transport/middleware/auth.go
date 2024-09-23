@@ -1,13 +1,14 @@
-package api
+package middleware
 
 import (
 	"net/http"
 	"os"
 
+	"github.com/chnmk/todo-list-final-task/internal/transport"
 	"github.com/golang-jwt/jwt"
 )
 
-// Middleware для проверки прав пользователя
+// Middleware для проверки прав пользователя.
 func Auth(next http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		pass := os.Getenv("TODO_PASSWORD")
@@ -24,7 +25,7 @@ func Auth(next http.HandlerFunc) http.HandlerFunc {
 				return []byte(pass), nil
 			})
 			if err != nil || !jwtToken.Valid {
-				returnError(w, "ошибка авторизации", 401)
+				transport.ReturnError(w, "ошибка авторизации", 401)
 				return
 			}
 		}

@@ -1,4 +1,4 @@
-package api
+package transport
 
 import (
 	"bytes"
@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/chnmk/todo-list-final-task/services"
+	"github.com/chnmk/todo-list-final-task/internal/services"
 	"github.com/chnmk/todo-list-final-task/tests"
 )
 
@@ -54,20 +54,20 @@ func TaskRequest(w http.ResponseWriter, r *http.Request) {
 	case http.MethodDelete:
 		taskDELETE(w, r)
 	default:
-		returnError(w, "неожиданный метод запроса", 500)
+		ReturnError(w, "неожиданный метод запроса", 500)
 		return
 	}
 }
 
 // Записывает текст ошибки в JSON-файл и возвращает ответ с указанным кодом ошибки.
-func returnError(w http.ResponseWriter, msg string, status int) {
+func ReturnError(w http.ResponseWriter, msg string, status int) {
 	var e ResponseInvalid
 	e.Error = msg
 
 	resp, err := json.Marshal(e)
 	if err != nil {
 		e.Error = "ошибка при записи ответа"
-		returnError(w, msg, 500)
+		ReturnError(w, msg, 500)
 	}
 
 	if status == 400 {
@@ -86,7 +86,7 @@ func checkRequest(w http.ResponseWriter, r *http.Request) (Task, error) {
 	now := time.Now().Format("20060102")
 	nowParsed, err := time.Parse("20060102", now)
 	if err != nil {
-		returnError(w, err.Error(), 500)
+		ReturnError(w, err.Error(), 500)
 		return Task{}, err
 	}
 
@@ -95,18 +95,18 @@ func checkRequest(w http.ResponseWriter, r *http.Request) (Task, error) {
 
 	_, err = buf.ReadFrom(r.Body)
 	if err != nil {
-		returnError(w, err.Error(), 500)
+		ReturnError(w, err.Error(), 500)
 		return Task{}, err
 	}
 
 	if err = json.Unmarshal(buf.Bytes(), &task); err != nil {
-		returnError(w, err.Error(), 500)
+		ReturnError(w, err.Error(), 500)
 		return Task{}, err
 	}
 
 	// Проверка на наличие title
 	if task.Title == "" {
-		returnError(w, "отсутствует название задачи", 400)
+		ReturnError(w, "отсутствует название задачи", 400)
 		return Task{}, errors.New("отсутствует название задачи")
 	}
 
@@ -118,7 +118,7 @@ func checkRequest(w http.ResponseWriter, r *http.Request) (Task, error) {
 	// Проверяет формат даты 20060102
 	dateParsed, err := time.Parse("20060102", task.Date)
 	if err != nil {
-		returnError(w, "некорректный формат времени", 400)
+		ReturnError(w, "некорректный формат времени", 400)
 		return Task{}, err
 	}
 
@@ -128,7 +128,7 @@ func checkRequest(w http.ResponseWriter, r *http.Request) (Task, error) {
 			// При указанном правиле повторения нужно вычислить и записать в таблицу дату выполнения
 			task.Date, err = services.NextDate(time.Now(), task.Date, task.Repeat)
 			if err != nil {
-				returnError(w, err.Error(), 500)
+				ReturnError(w, err.Error(), 500)
 				return Task{}, err
 			}
 		} else {

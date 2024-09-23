@@ -1,4 +1,4 @@
-package api
+package transport
 
 import (
 	"database/sql"
@@ -20,7 +20,7 @@ func taskPOST(w http.ResponseWriter, r *http.Request) {
 	// Если всё правильно, добавляет новую запись
 	db, err := sql.Open("sqlite", DatabaseDir)
 	if err != nil {
-		returnError(w, err.Error(), 500)
+		ReturnError(w, err.Error(), 500)
 		return
 	}
 
@@ -33,13 +33,13 @@ func taskPOST(w http.ResponseWriter, r *http.Request) {
 		sql.Named("repeat", task.Repeat),
 	)
 	if err != nil {
-		returnError(w, err.Error(), 500)
+		ReturnError(w, err.Error(), 500)
 		return
 	}
 
 	id, err := res.LastInsertId()
 	if err != nil {
-		returnError(w, err.Error(), 500)
+		ReturnError(w, err.Error(), 500)
 		return
 	}
 
@@ -47,7 +47,7 @@ func taskPOST(w http.ResponseWriter, r *http.Request) {
 	responseValid.Id = strconv.FormatInt(id, 10)
 	resp, err := json.Marshal(responseValid)
 	if err != nil {
-		returnError(w, err.Error(), 500)
+		ReturnError(w, err.Error(), 500)
 		return
 	}
 

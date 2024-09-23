@@ -8,6 +8,7 @@ import (
 	"time"
 )
 
+// Переназначает задачу на следующую дату.
 func NextDate(now time.Time, date string, repeat string) (string, error) {
 	var result string
 
