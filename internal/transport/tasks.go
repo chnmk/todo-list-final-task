@@ -3,6 +3,7 @@ package transport
 import (
 	"database/sql"
 	"encoding/json"
+	"log"
 	"net/http"
 	"time"
 
@@ -11,6 +12,7 @@ import (
 
 // Обрабатывает запросы к /api/tasks, возвращает ближайшие 10 задач.
 func TasksRequest(w http.ResponseWriter, r *http.Request) {
+	log.Println("New request to /api/tasks")
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
 	// Обработка параметров поиска
@@ -72,6 +74,7 @@ func TasksRequest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	log.Println("Success!")
 	w.WriteHeader(http.StatusOK)
 	w.Write(resp)
 }

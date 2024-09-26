@@ -2,6 +2,7 @@ package transport
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 
 	"github.com/chnmk/todo-list-final-task/internal/database"
@@ -28,6 +29,7 @@ func taskDELETE(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	log.Println("Success!")
 	w.WriteHeader(http.StatusOK)
 	w.Write(resp)
 }

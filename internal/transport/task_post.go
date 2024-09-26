@@ -2,6 +2,7 @@ package transport
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -33,6 +34,7 @@ func taskPOST(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	log.Println("Success!")
 	w.WriteHeader(http.StatusOK)
 	w.Write(resp)
 }

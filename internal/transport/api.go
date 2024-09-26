@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
+	"log"
 	"net/http"
 	"time"
 
@@ -38,6 +39,8 @@ var DatabaseDir = tests.DBFile
 
 // Выбирает хендлер в зависимости от метода запроса к /api/task, либо возвращает ошибку
 func TaskRequest(w http.ResponseWriter, r *http.Request) {
+	log.Println("New request to /api/task, method: " + r.Method)
+
 	switch r.Method {
 	case http.MethodPost:
 		taskPOST(w, r)
@@ -48,6 +51,7 @@ func TaskRequest(w http.ResponseWriter, r *http.Request) {
 	case http.MethodDelete:
 		taskDELETE(w, r)
 	default:
+		log.Println("Error: unexpected request method")
 		ReturnError(w, "неожиданный метод запроса", 500)
 		return
 	}
@@ -72,6 +76,7 @@ func ReturnError(w http.ResponseWriter, msg string, status int) {
 		w.WriteHeader(http.StatusInternalServerError)
 	}
 
+	log.Println("Error: " + e.Error)
 	w.Write(resp)
 }
 

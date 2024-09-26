@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"log"
 	"net/http"
 	"os"
 
@@ -11,6 +12,8 @@ import (
 // Middleware для проверки прав пользователя.
 func Auth(next http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.Println("Warning: authentication required")
+
 		pass := os.Getenv("TODO_PASSWORD")
 		if len(pass) > 0 {
 			var requestJwt string
@@ -29,6 +32,8 @@ func Auth(next http.HandlerFunc) http.HandlerFunc {
 				return
 			}
 		}
+
+		log.Println("Authentication successful")
 		next(w, r)
 	})
 }

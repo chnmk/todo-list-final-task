@@ -51,7 +51,7 @@ func AuthHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Вывод токена в консоль для тестов
-	log.Println("JWT ТОКЕН: " + signedToken)
+	log.Println("Новый токен авторизации: " + signedToken)
 
 	var tokenStruct transport.TokenStruct
 	tokenStruct.Token = signedToken

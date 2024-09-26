@@ -2,6 +2,7 @@ package transport
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 
 	"github.com/chnmk/todo-list-final-task/internal/database"
@@ -9,6 +10,7 @@ import (
 
 // Удаляет или переносит на следующую дату задачу с полученном в запросе id.
 func TaskDone(w http.ResponseWriter, r *http.Request) {
+	log.Println("New request to /api/task/done, method: " + r.Method)
 	if r.Method != http.MethodPost {
 		ReturnError(w, "неожиданный метод запроса", 500)
 		return
@@ -33,6 +35,7 @@ func TaskDone(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	log.Println("Success!")
 	w.WriteHeader(http.StatusOK)
 	w.Write(resp)
 }
