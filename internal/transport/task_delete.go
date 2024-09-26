@@ -1,9 +1,10 @@
 package transport
 
 import (
-	"database/sql"
 	"encoding/json"
 	"net/http"
+
+	"github.com/chnmk/todo-list-final-task/internal/database"
 )
 
 func taskDELETE(w http.ResponseWriter, r *http.Request) {
@@ -14,20 +15,9 @@ func taskDELETE(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Удаление записи без правил повторения
-	del, err := DatabaseFile.Exec("DELETE FROM scheduler WHERE id = :id",
-		sql.Named("id", id),
-	)
+	err := database.DeleteTaskById(DatabaseFile, id)
 	if err != nil {
 		ReturnError(w, err.Error(), 500)
-		return
-	}
-
-	rows, err := del.RowsAffected()
-	if err != nil {
-		ReturnError(w, err.Error(), 500)
-		return
-	} else if rows == 0 {
-		ReturnError(w, "задача не найдена", 500)
 		return
 	}
 

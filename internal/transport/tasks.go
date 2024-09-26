@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"net/http"
 	"time"
+
+	"github.com/chnmk/todo-list-final-task/internal/services"
 )
 
 // Обрабатывает запросы к /api/tasks, возвращает ближайшие 10 задач.
@@ -24,7 +26,7 @@ func TasksRequest(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Составление строки запроса
-	var tasks []Task
+	var tasks []services.Task
 
 	query := "SELECT * FROM scheduler ORDER BY date LIMIT 10"
 	if search != "" && !searchDate {
@@ -44,7 +46,7 @@ func TasksRequest(w http.ResponseWriter, r *http.Request) {
 
 	// Чтение данных из базы
 	for rows.Next() {
-		task := Task{}
+		task := services.Task{}
 
 		err := rows.Scan(&task.Id, &task.Date, &task.Title, &task.Comment, &task.Repeat)
 		if err != nil {
@@ -61,7 +63,7 @@ func TasksRequest(w http.ResponseWriter, r *http.Request) {
 	if tasks != nil {
 		result.Tasks = tasks
 	} else {
-		result.Tasks = []Task{}
+		result.Tasks = []services.Task{}
 	}
 
 	resp, err := json.Marshal(result)

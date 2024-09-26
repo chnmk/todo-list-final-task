@@ -12,16 +12,8 @@ import (
 	"github.com/chnmk/todo-list-final-task/tests"
 )
 
-type Task struct {
-	Id      string `json:"id"`
-	Date    string `json:"date"`
-	Title   string `json:"title"`
-	Comment string `json:"comment"`
-	Repeat  string `json:"repeat"`
-}
-
 type TasksArray struct {
-	Tasks []Task `json:"tasks"`
+	Tasks []services.Task `json:"tasks"`
 }
 
 type ResponseValid struct {
@@ -84,32 +76,32 @@ func ReturnError(w http.ResponseWriter, msg string, status int) {
 }
 
 // Читает тело запроса и проверяет полученные данные на корректность.
-func checkRequest(w http.ResponseWriter, r *http.Request) (Task, error) {
+func checkRequest(w http.ResponseWriter, r *http.Request) (services.Task, error) {
 	now := time.Now().Format("20060102")
 	nowParsed, err := time.Parse("20060102", now)
 	if err != nil {
 		ReturnError(w, err.Error(), 500)
-		return Task{}, err
+		return services.Task{}, err
 	}
 
-	var task Task
+	var task services.Task
 	var buf bytes.Buffer
 
 	_, err = buf.ReadFrom(r.Body)
 	if err != nil {
 		ReturnError(w, err.Error(), 500)
-		return Task{}, err
+		return services.Task{}, err
 	}
 
 	if err = json.Unmarshal(buf.Bytes(), &task); err != nil {
 		ReturnError(w, err.Error(), 500)
-		return Task{}, err
+		return services.Task{}, err
 	}
 
 	// Проверка на наличие title
 	if task.Title == "" {
 		ReturnError(w, "отсутствует название задачи", 400)
-		return Task{}, errors.New("отсутствует название задачи")
+		return services.Task{}, errors.New("отсутствует название задачи")
 	}
 
 	// Если дата пустая или не указана, берётся сегодняшнее число
@@ -121,7 +113,7 @@ func checkRequest(w http.ResponseWriter, r *http.Request) (Task, error) {
 	dateParsed, err := time.Parse("20060102", task.Date)
 	if err != nil {
 		ReturnError(w, "некорректный формат времени", 400)
-		return Task{}, err
+		return services.Task{}, err
 	}
 
 	// Если дата меньше сегодняшнего числа...
@@ -131,7 +123,7 @@ func checkRequest(w http.ResponseWriter, r *http.Request) (Task, error) {
 			task.Date, err = services.NextDate(time.Now(), task.Date, task.Repeat)
 			if err != nil {
 				ReturnError(w, err.Error(), 500)
-				return Task{}, err
+				return services.Task{}, err
 			}
 		} else {
 			// Если правило повторения не указано или равно пустой строке, подставляется сегодняшнее число

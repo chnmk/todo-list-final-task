@@ -1,10 +1,11 @@
 package transport
 
 import (
-	"database/sql"
 	"encoding/json"
 	"net/http"
 	"strconv"
+
+	"github.com/chnmk/todo-list-final-task/internal/database"
 )
 
 func taskPOST(w http.ResponseWriter, r *http.Request) {
@@ -18,18 +19,7 @@ func taskPOST(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Если всё правильно, добавляет новую запись
-	res, err := DatabaseFile.Exec("INSERT INTO scheduler (date, title, comment, repeat) VALUES (:date, :title, :comment, :repeat)",
-		sql.Named("date", task.Date),
-		sql.Named("title", task.Title),
-		sql.Named("comment", task.Comment),
-		sql.Named("repeat", task.Repeat),
-	)
-	if err != nil {
-		ReturnError(w, err.Error(), 500)
-		return
-	}
-
-	id, err := res.LastInsertId()
+	id, err := database.AddTask(DatabaseFile, task)
 	if err != nil {
 		ReturnError(w, err.Error(), 500)
 		return

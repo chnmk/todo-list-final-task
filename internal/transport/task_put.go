@@ -1,9 +1,10 @@
 package transport
 
 import (
-	"database/sql"
 	"encoding/json"
 	"net/http"
+
+	"github.com/chnmk/todo-list-final-task/internal/database"
 )
 
 func taskPUT(w http.ResponseWriter, r *http.Request) {
@@ -17,24 +18,9 @@ func taskPUT(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Если всё правильно, редактирует запись
-	upd, err := DatabaseFile.Exec("UPDATE scheduler SET (date, title, comment, repeat) = (:date, :title, :comment, :repeat) WHERE id = :id",
-		sql.Named("id", task.Id),
-		sql.Named("date", task.Date),
-		sql.Named("title", task.Title),
-		sql.Named("comment", task.Comment),
-		sql.Named("repeat", task.Repeat),
-	)
+	err = database.UpdateTask(DatabaseFile, task)
 	if err != nil {
 		ReturnError(w, err.Error(), 500)
-		return
-	}
-
-	rows, err := upd.RowsAffected()
-	if err != nil {
-		ReturnError(w, err.Error(), 500)
-		return
-	} else if rows == 0 {
-		ReturnError(w, "задача не найдена", 500)
 		return
 	}
 
